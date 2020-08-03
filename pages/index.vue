@@ -133,6 +133,7 @@
 <script>
 import axios from 'axios'
 import Vue2LeafletMarkerCluster from 'vue2-leaflet-markercluster'
+import 'leaflet/dist/leaflet.css'
 
 export default {
   asyncData({ params }) {
