@@ -1,31 +1,48 @@
 <template>
   <div id="map-wrap relative" style="height: 100vh">
     <div class="absolute top-0 left-0 p-4 z-overlay">
-      <div class="bg-white p-4 w-screen max-w-md flex shadow sm:rounded-lg">
-        <div class="grid grid-cols-1 gap-4 w-full">
+      <div class="flex w-screen max-w-md p-4 bg-white shadow sm:rounded-lg">
+        <div class="grid w-full grid-cols-1 gap-4">
           <div>
             <label
               for="location"
-              class="block text-sm leading-5 font-medium text-gray-700"
-              >{{ markers.length }} Providers for:</label
+              class="block text-sm font-medium leading-5 text-gray-700"
+              >{{ markersOne.length }} Providers for:</label
             >
             <select
               id="location"
               v-model="selectedTile"
-              class="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5"
+              class="block w-full py-2 pl-3 pr-10 mt-1 text-base leading-6 border-gray-300 form-select focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5"
             >
               <option :value="0">All</option>
               <option :value="1">Terrestrial</option>
               <option :value="2">Wired</option>
             </select>
           </div>
-          <!-- <div class="flex w-full flex-col">
+          <div>
+            <label
+              for="location"
+              class="block text-sm font-medium leading-5 text-gray-700"
+              >Marker set:</label
+            >
+            <select
+              id="location"
+              v-model="selectedMarkers"
+              class="block w-full py-2 pl-3 pr-10 mt-1 text-base leading-6 border-gray-300 form-select focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5"
+            >
+              <option :value="0">None</option>
+              <option :value="1">1</option>
+              <option :value="2">2</option>
+              <option :value="3">3</option>
+            </select>
+          </div>
+          <!-- <div class="flex flex-col w-full">
             <div>
               <label for="full_name" class="sr-only">Full name</label>
               <div class="relative rounded-md shadow-sm">
                 <input
                   id="full_name"
-                  class="form-input block w-full py-3 px-4 placeholder-gray-500 transition ease-in-out duration-150"
+                  class="block w-full px-4 py-3 placeholder-gray-500 transition duration-150 ease-in-out form-input"
                   placeholder="Full name"
                 />
               </div>
@@ -34,50 +51,50 @@
           <div class="flex flex-col w-full">
             <label
               for="location"
-              class="block text-sm leading-5 font-medium text-gray-700"
+              class="block text-sm font-medium leading-5 text-gray-700"
               >Number of providers:</label
             >
             <div
-              class="relative mt-1 flex shadow-md rounded-md overflow-hidden"
+              class="relative flex mt-1 overflow-hidden rounded-md shadow-md"
             >
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-gray-800 font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold text-gray-800"
                 :style="'background: ' + colors[0]"
               >
                 0
               </div>
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-gray-800 font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold text-gray-800"
                 :style="'background: ' + colors[1]"
               >
                 1
               </div>
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-gray-800 font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold text-gray-800"
                 :style="'background: ' + colors[2]"
               >
                 2
               </div>
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-white font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold text-white"
                 :style="'background: ' + colors[3]"
               >
                 3
               </div>
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-white font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold text-white"
                 :style="'background: ' + colors[4]"
               >
                 4
               </div>
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-white font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold text-white"
                 :style="'background: ' + colors[5]"
               >
                 6
               </div>
               <div
-                class="flex items-center w-full justify-center px-4 py-2 text-white leading-none font-bold"
+                class="flex items-center justify-center w-full px-4 py-2 font-bold leading-none text-white"
                 :style="'background: ' + colors[6]"
               >
                 12+
@@ -88,13 +105,13 @@
             <div>
               <label
                 for="location"
-                class="block text-sm leading-5 font-medium text-gray-700"
+                class="block text-sm font-medium leading-5 text-gray-700"
                 >Overlay opacity:</label
               >
               <div class="flex items-center">
                 <input
                   v-model="tileOpacity"
-                  class="form-range flex-grow"
+                  class="flex-grow form-range"
                   type="range"
                   min="0"
                   max="1"
@@ -115,25 +132,25 @@
           class="z-50"
           :url="tileType"
         ></l-tile-layer>
-        <v-marker-cluster v-if="markers" :options="{ chunkedLoading: true }">
-          <v-marker v-for="(c, i) in markers" :lat-lng="c.latlng" :key="i">
-            <v-popup :content="c.PERMADDR1"></v-popup>
-          </v-marker>
-        </v-marker-cluster>
+        <l-marker-cluster class="z-overlay" v-if="selectedMarkers == 1">
+          <l-marker
+            v-for="(c, i) in markersOne"
+            :lat-lng="handleLatLng(c.latlng)"
+            :key="i"
+          >
+            <l-popup :content="c.PERMADDR1"></l-popup>
+          </l-marker>
+        </l-marker-cluster>
       </l-map>
     </no-ssr>
   </div>
 </template>
 
-<style>
-@import '~/node_modules/leaflet.markercluster/dist/MarkerCluster.css';
-@import '~/node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css';
-</style>
-
 <script>
 import axios from 'axios'
 import Vue2LeafletMarkerCluster from 'vue2-leaflet-markercluster'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 
 export default {
   asyncData({ params }) {
@@ -146,10 +163,11 @@ export default {
       })
   },
   components: {
-    'v-marker-cluster': Vue2LeafletMarkerCluster
+    'l-marker-cluster': Vue2LeafletMarkerCluster
   },
   data() {
     return {
+      selectedMarkers: 0,
       markers: null,
       showMapTiles: false,
       tileOpacity: 0.8,
@@ -173,7 +191,19 @@ export default {
       mapTiles: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
     }
   },
+  methods: {
+    handleLatLng(l) {
+      const latlng = []
+      latlng.push(parseFloat(l.split(',')[1]))
+      latlng.push(parseFloat(l.split(',')[0]))
+      // console.log('l', latlng)
+      return latlng
+    }
+  },
   computed: {
+    markersOne() {
+      return this.markers.slice(0, 50000)
+    },
     tileType() {
       if (this.selectedTile === 0) return this.allTiles
       if (this.selectedTile === 1) return this.terrestrialTiles
