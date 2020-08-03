@@ -115,7 +115,7 @@
           class="z-50"
           :url="tileType"
         ></l-tile-layer>
-        <v-marker-cluster v-if="markers">
+        <v-marker-cluster v-if="markers" :options="{ chunkedLoading: true }">
           <v-marker v-for="(c, i) in markers" :lat-lng="c.latlng" :key="i">
             <v-popup :content="c.PERMADDR1"></v-popup>
           </v-marker>
